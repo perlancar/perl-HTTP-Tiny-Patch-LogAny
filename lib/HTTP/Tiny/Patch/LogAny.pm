@@ -28,9 +28,10 @@ my $p_request = sub {
 
         my ($self, $method, $url, $args) = @_;
         my $hh = $args->{headers} // {};
-        $log->tracef("HTTP::Tiny request (not raw):\n%s %s\n%s\n",
+        $log->tracef("HTTP::Tiny request (not raw):\n%s %s\n%s\ncontent: %s",
                      $method, $url,
-                     join("", map {"$_: $hh->{$_}\n"} sort keys %$hh));
+                     join("", map {"$_: $hh->{$_}\n"} sort keys %$hh),
+                     $args->{content});
     }
 
     my $res = $orig->(@_);

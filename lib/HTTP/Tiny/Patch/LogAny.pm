@@ -1,5 +1,8 @@
 package HTTP::Tiny::Patch::LogAny;
 
+# DATE
+# VERSION
+
 use 5.010001;
 use strict;
 no warnings;
@@ -7,13 +10,11 @@ no warnings;
 use Module::Patch 0.12 qw();
 use base qw(Module::Patch);
 
-# VERSION
-
 our %config;
 
 my $p_request = sub {
-    require Log::Any;
-    my $log = Log::Any->get_logger;
+    require Log::Any::IfLOG;
+    my $log = Log::Any::IfLOG->get_logger;
 
     my $ctx = shift;
     my $orig = $ctx->{orig};

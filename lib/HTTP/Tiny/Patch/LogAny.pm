@@ -12,6 +12,15 @@ use base qw(Module::Patch);
 
 our %config;
 
+sub _render_headers {
+    my $headers = shift;
+    join("", map {
+        my $k = $_;
+        my $v = $headers->{$_};
+        join("", map { "$k: $_\n"} ref($v) eq 'ARRAY' ? @$v : ($v))
+    } sort keys %$headers);
+}
+
 my $p_request = sub {
     require Log::Any::IfLOG;
     my $log = Log::Any::IfLOG->get_logger;
@@ -31,7 +40,7 @@ my $p_request = sub {
         my $hh = $args->{headers} // {};
         $log->tracef("HTTP::Tiny request (not raw):\n%s %s\n%s\ncontent: %s",
                      $method, $url,
-                     join("", map {"$_: $hh->{$_}\n"} sort keys %$hh),
+                     _render_headers($hh),
                      $args->{content});
     }
 
@@ -46,7 +55,8 @@ my $p_request = sub {
         my $hh = $res->{headers} // {};
         $log->tracef("HTTP::Tiny response (not raw):\n%s %s %s\n%s\n",
                      $res->{status}, $res->{reason}, $res->{protocol},
-                     join("", map {"$_: $hh->{$_}\n"} sort keys %$hh));
+                     _render_headers($hh),
+                 );
     }
 
     if ($config{-log_response_content} && $log->is_trace) {
